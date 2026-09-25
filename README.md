@@ -315,6 +315,6 @@ The compiled, signed release APK is generated at:
 ---
 
 ## 👥 Contributors & Academic Credits
-* **Project Name**: AttendX (BeaconAttend)
+* **Project Name**: AttendX 
 * **Target Domain**: Smart Campus, IoT in Education, Anti-Proxy Proximity Attestation
-* **Platform**: Cross-Platform Android & iOS (Native BLE enabled)
+
