@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 /**
  * Base User schema shared across Student, Faculty, and Admin roles.
  * Password is hashed before saving using bcrypt (12 salt rounds).
+ * Includes boundDeviceId for hardware authentication.
  */
 const UserSchema = new mongoose.Schema(
   {
@@ -31,9 +32,24 @@ const UserSchema = new mongoose.Schema(
       enum: ['student', 'faculty', 'admin'],
       required: true,
     },
+    studentId: {
+      type: String,
+      trim: true,
+    },
     department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Department',
+    },
+    subjects: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    boundDeviceId: {
+      type: String,
+      default: null,
+      trim: true,
     },
     profilePic: {
       type: String,
@@ -43,7 +59,29 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Academic profile — used for student attendance eligibility
+    year: {
+      type: Number,
+      min: 1,
+      max: 4,
+      default: null,
+    },
+    semester: {
+      type: Number,
+      min: 1,
+      max: 8,
+      default: null,
+    },
+    division: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isApproved: {
       type: Boolean,
       default: true,
     },

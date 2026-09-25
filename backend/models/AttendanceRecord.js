@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * AttendanceRecord - a single attendance mark for one student in one session.
- * Records RSSI for BLE proximity verification evidence.
+ * AttendanceRecord - single attendance mark for one student in one session.
+ * Stores RSSI, verification score, trust factors, and bound device ID.
  */
 const AttendanceRecordSchema = new mongoose.Schema(
   {
@@ -25,6 +25,11 @@ const AttendanceRecordSchema = new mongoose.Schema(
     bleRSSI: {
       type: Number,
     },
+    // Estimated distance in meters
+    distanceMeters: {
+      type: Number,
+      default: -1,
+    },
     // Whether BLE verification passed
     bleVerified: {
       type: Boolean,
@@ -35,11 +40,38 @@ const AttendanceRecordSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Unique device ID hardware binding
+    deviceId: {
+      type: String,
+    },
+    // Overall multi-factor trust score (0 - 100)
+    verificationScore: {
+      type: Number,
+      default: 0,
+    },
+    // Detailed factor breakdown
+    trustFactors: {
+      type: Object,
+      default: {},
+    },
+    flaggedReasons: {
+      type: [String],
+      default: [],
+    },
     // Final attendance status
     status: {
       type: String,
-      enum: ['present', 'absent', 'late'],
+      enum: ['present', 'flagged', 'rejected', 'absent'],
       default: 'present',
+    },
+    reviewNote: {
+      type: String,
+      default: null,
+    },
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     markedAt: {
       type: Date,
@@ -55,5 +87,6 @@ const AttendanceRecordSchema = new mongoose.Schema(
 // Prevent duplicate attendance for same student in same session
 AttendanceRecordSchema.index({ session: 1, student: 1 }, { unique: true });
 AttendanceRecordSchema.index({ student: 1, subject: 1 });
+AttendanceRecordSchema.index({ session: 1, status: 1 });
 
 module.exports = mongoose.model('AttendanceRecord', AttendanceRecordSchema);
